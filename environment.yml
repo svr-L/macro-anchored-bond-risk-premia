@@ -1,0 +1,21 @@
+name: macroanchor-bond-risk-premia
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy
+  - pandas
+  - scipy
+  - statsmodels
+  - matplotlib
+  - scikit-learn
+  - requests
+  - pandas-datareader
+  - yfinance
+  - jupyterlab
+  - notebook
+  - nbformat
+  - nbconvert
+  - openpyxl
+  - tqdm
+  - pip

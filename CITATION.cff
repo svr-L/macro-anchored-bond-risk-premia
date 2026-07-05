@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this research code or paper, please cite it as below."
+title: "Macro-Anchored Bond Risk Premia"
+authors:
+  - family-names: "Lauriola"
+    given-names: "Saverio"
+year: 2026
+version: "0.1.0"
+repository-code: "https://github.com/<your-username>/macro-anchored-bond-risk-premia"
+abstract: "A reproducible research stack on macro-anchored affine short-rate signals, bond risk premia, out-of-sample discipline, G10 replication, and specification audits."
+license: MIT

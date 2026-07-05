@@ -1,0 +1,10 @@
+Recommended notebook order:
+
+1. notebooks/00_capstone_overview.ipynb
+2. notebooks/01_affine_short_rate_us.ipynb
+3. notebooks/02_us_reconciliation_ladder.ipynb
+4. notebooks/03_us_row_by_row_audit.ipynb
+5. notebooks/04_g10_panel_replication.ipynb
+6. notebooks/05_g10_panel_us_diagnostics.ipynb
+7. extensions/06_taa_overlay_diagnostics.ipynb
+8. extensions/07_curve_rv_extension_v1.ipynb

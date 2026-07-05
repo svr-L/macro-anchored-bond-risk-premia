@@ -1,0 +1,586 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1.05in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[round,authoryear]{natbib}
+\IfFileExists{lmodern.sty}{\usepackage{lmodern}}{}
+\IfFileExists{microtype.sty}{\usepackage{microtype}}{}
+\usepackage[hidelinks]{hyperref}
+\usepackage{setspace}
+\setstretch{1.12}
+\newcommand{\E}{\mathbb{E}}
+
+\title{The Macro Anchor as a Short-Rate Central Tendency:\\
+Bond Risk Premia, Out-of-Sample Discipline, and a Specification Audit\thanks{%
+Working paper. All results are produced by fully reproducible, deterministic notebooks
+(expanding-window estimation throughout; FRED/OECD data with documented fallbacks). All
+errors are mine. Comments welcome.}}
+\author{Saverio Lauriola\thanks{Quantitative Risk Analyst. Email available on request. The
+views expressed are the author's own and do not represent those of any employer.}}
+\date{July 2026 --- first draft}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+This paper asks whether the intuition that nominal yields gravitate toward a
+\emph{macro-consistent anchor} --- the neutral real rate plus trend inflation --- contains
+tradeable information about bond risk premia, and answers it by escalating the discipline of
+the test rather than the flexibility of the signal. Two natural formulations fail honestly:
+long-yield levels barely mean-revert, and the raw 10-year ``anchor gap,'' despite strong
+in-sample significance on a 50-year sample (Newey--West $t=2.86$) and cleanly monotone
+return quintiles, does not survive out of sample ($R^2_{OOS}=-0.49$; Cochrane--Piazzesi
+fares worse). The idea survives only in its theoretically disciplined form: the anchor as
+the \emph{central tendency of a Hull--White short-rate process}, with reversion estimated at
+the front end where it exists and the term premium obtained as an \emph{output}. The
+resulting model term premium is not the slope in disguise (correlation $0.35$), tracks the
+Kim--Wright benchmark ($0.70$) with three transparent parameters, is significant in sample
+at every tenor with $t$-statistics monotone in maturity ($2.06$ to $3.87$), and is the only
+predictor in a five-way horse race with a \emph{positive realized} out-of-sample $R^2$
+(basket $+0.012$, Clark--West 10\%; exact 10Y target $+0.085$, Clark--West 5\%). A
+pre-specified replication across nine developed markets yields $9/9$ positive slopes and
+positive $R^2_{OOS}$ in $6/9$. The paper's distinctive section is a \emph{specification and
+data audit} that decomposes the entire $0.012\!\to\!0.215$ spread across test variants into
+named, quantified ingredients --- tenor concentration ($+0.07$), a duration-approximated
+target ($+0.05$), the funding-rate series ($+0.07$), and sample length ($+0.06$) --- and
+shows the reversion parameter is identified by pre-ZLB history. Results are robust to a
+publication-lag inflation input. The framing throughout is \emph{theory as regularization}:
+the signal with the best in-sample fit has the worst out-of-sample record, and the
+model-disciplined form is the only survivor.
+\end{abstract}
+
+\vspace{0.5em}
+\noindent\textbf{Keywords:} bond risk premia; term premium; affine short-rate models;
+out-of-sample $R^2$; Clark--West; neutral rate; specification audit.
+
+\section{Introduction}
+
+A recurring intuition in macro-rates investing is that nominal yields should gravitate not
+toward their own historical mean but toward a \emph{macro-consistent anchor}: the neutral
+real short rate $r^*$ plus expected long-run inflation $\pi_e$ (plus, for long tenors, a
+term premium). When the observed yield sits far above that anchor, bonds look cheap against
+fundamentals; far below, rich. The intuition is old, respectable, and dangerous --- because
+it invites exactly the kind of in-sample overfitting that the return-predictability
+literature has learned to distrust \citep{goyalwelch,bauerhamilton}.
+
+This paper takes the intuition seriously by doing the opposite of tuning it. We fix the
+anchor's construction once, test the idea in three progressively more disciplined
+formulations, report the failures with the same prominence as the success, and subject the
+surviving result to a replication across nine markets and to a full specification and data
+audit. Four findings emerge.
+
+\textbf{First, two honest failures.} As a \emph{level-timing} signal the idea is dead on
+arrival: at monthly frequency the 10-year level and slope are statistically
+indistinguishable from random walks (estimated reversion speeds $\kappa\approx 0.02$ and
+$\approx 0$). As a \emph{raw risk-premium} predictor --- regressing next-12-month bond
+excess returns on the gap between the 10-year yield and the anchor, in the spirit of
+\citet{cieslakpovala} --- the signal is strongly significant in sample on a five-decade
+sample (Newey--West $t=2.86$, $R^2=0.13$, and mean subsequent excess returns rising
+monotonically from $+0.13\%$ to $+6.55\%$ across gap quintiles) yet posts an out-of-sample
+$R^2$ of $-0.49$ against the expanding-mean benchmark of \citet{campbellthompson}. For
+context, the \citet{cochranepiazzesi} forward-rate factor does worse ($-1.24$) on the same
+protocol. This is the \citet{goyalwelch} pattern in miniature, and we report it as a
+result, not a nuisance.
+
+\textbf{Second, the idea survives in exactly one form --- the theoretically disciplined
+one.} We embed the anchor where the data say reversion actually lives: as the time-varying
+central tendency $\theta_t=r^*_t+\pi_{e,t}$ of a Hull--White short-rate process
+\citep{hullwhite}, estimated under the physical measure by regressing $\Delta r$ on the gap
+to the anchor --- the project's original ``policy-gap'' intuition promoted to a parameter
+estimator. The pure-expectations curve (expectations plus convexity, zero price of risk)
+then delivers a \emph{model-implied term premium per tenor as an output},
+$TP(\tau,t)=y_{obs}(\tau,t)-y_{PE}(\tau,t)$. Three honesty checks discipline the object:
+the HW term premium correlates only $0.35$ with the slope (constant-$\theta$ Vasicek and
+CIR analogues, lacking the anchor, correlate $0.77$ and $0.89$ --- they \emph{are} the
+slope in disguise); it tracks the Kim--Wright five-factor benchmark at $0.70$ with three
+transparent parameters (the anchor-free models track it at $0.03$ and $0.18$); and its
+in-sample predictive $t$-statistics are monotone in tenor, from $2.06$ at two years to
+$3.87$ at ten.
+
+\textbf{Third, the surviving signal passes the out-of-sample gate that everything else
+fails, and replicates across markets.} In a five-way horse race on a common evaluation
+window (1997--2026, 336 months) the HW term premium is the only predictor with a positive
+\emph{realized} out-of-sample $R^2$ ($+0.012$ on a 2--10Y basket; $+0.085$ on the exact
+10-year target), with Clark--West significance at the 10\% and 5\% level respectively;
+slope and Fama--Bliss have comparable Clark--West statistics but negative realized
+$R^2_{OOS}$ --- population content destroyed by estimation noise --- and lose their 5\%
+stars once evaluated on the common window. Running the \emph{same, pre-specified} pipeline
+on nine developed markets yields positive slopes in $9/9$ countries, $R^2_{OOS}>0$ in
+$6/9$, and Clark--West above the 10\% threshold in $7/9$, with the failures (Australia,
+Norway, a too-short Swiss sample) reported alongside.
+
+\textbf{Fourth --- and the paper's distinctive contribution --- an audit, not just a
+result.} The panel's US row is far stronger ($R^2_{OOS}=+0.215$) than the strict US
+benchmark ($+0.012$). Rather than headline the larger number, we decompose the entire gap
+with a reconciliation ladder and a month-by-month data audit: tenor concentration accounts
+for $+0.07$ (the effect lives at the long end; the basket dilutes it), the
+duration-approximated target for $+0.05$ (it shares the carry with the predictor and omits
+roll-down), the funding-rate series for $+0.07$ (T-bill versus interbank --- the raw
+ten-year yields are \emph{numerically identical} across sources, so the residual is
+entirely the short leg), and the longer sample for $+0.06$. The signal itself is identical
+across specifications (the cross-variants coincide to machine precision). A sample-cut
+diagnostic adds a structural finding: re-estimating on post-1997 data alone drives the
+reversion speed to its floor ($\kappa\to 10^{-4}$) and the result collapses --- the anchor
+parameter is \emph{identified by pre-ZLB history}; the zero-rate decade alone contains no
+information about it. A pre-specified reading rule, written before the audit numbers, then fixes
+the framing: the panel is long-sample cross-country replication; the strict benchmark is
+the US common-window result.
+
+The paper relates to the bond risk-premium literature descending from \citet{famabliss}
+and \citet{cochranepiazzesi}, to the trend-inflation ``cycle'' factor of
+\citet{cieslakpovala} --- our raw gap is essentially their object, and our failure/success
+pattern refines where its content resides --- and to the out-of-sample skepticism of
+\citet{goyalwelch}, \citet{bauerhamilton} and \citet{duffee}. Methodologically we lean on
+\citet{campbellthompson} and \citet{clarkwest} for evaluation, on \citet{neweywest} for
+inference with overlapping targets, on \citet{vasicek}, \citet{cir} and \citet{hullwhite}
+for the model, on \citet{hlw} and \citet{kimwright} for the anchor's external references,
+and on \citet{pesaransmith} for the panel mean-group estimate. Our contribution is not a
+new predictor class; it is a demonstration, unusually complete in its accounting, of
+\emph{where} a popular macro intuition holds, where it does not, and how much of any
+headline number is specification.
+
+\section{Data and the macro anchor}\label{sec:data}
+
+\textbf{United States.} Monthly, June 1976 to May 2026 (599 observations). Constant-maturity
+Treasury yields GS1--GS10 (FRED); the state variable is the 3-month T-bill (TB3MS); CPI is
+CPIAUCSL; the external term-premium reference is the Kim--Wright 10-year series
+(THREEFYTP10). The 1976 start is imposed by GS2 availability. All series are month-end.
+
+\textbf{The anchor.} We deliberately freeze a simple, replicable construction:
+\begin{equation}
+\theta_t \;=\; r^*_t + \pi_{e,t},\qquad
+\pi_{e,t}=\text{EWMA}_{36m}\!\left(\Delta_{12}\log \text{CPI}\right),\qquad
+r^*_t=\text{EWMA}_{120m}\!\left(r_t-\pi_{e,t}\right),
+\end{equation}
+i.e.\ trend inflation is a three-year-half-life average of trailing year-on-year CPI
+(the construction underlying the \citealp{cieslakpovala} cycle), and the neutral real rate
+is a slow ten-year-half-life average of the realized real short rate (the
+Holston--Laubach--Williams estimate is used instead whenever reachable; the notebook prints
+which source was used). No term-premium block enters the \emph{short-rate} anchor: for long
+tenors the term premium is an output of the model, not an input. Section~\ref{sec:robust}
+shows the results are essentially unchanged when CPI enters with a one-month publication
+lag.
+
+\textbf{G10 panel.} Nine markets (USA, DEU, GBR, CAN, CHE, SWE, NOR, AUS, NZL; Japan is
+dropped for insufficient overlapping data --- a convenient absence we flag, since Japan is
+the archetypal ZLB case where the model is least at home). Sources are OECD MEI series on
+FRED: 10-year government yields (\texttt{IRLTLT01*}), 3-month interbank rates
+(\texttt{IR3TIB01*}), CPI (\texttt{*CPIALLMINMEI}, quarterly fallback for AUS/NZL). Spans
+range from 1960 (DEU, GBR, CAN) to 1999 (CHE). Absent full foreign curves, the panel target
+is the standard duration approximation
+$rx^{(10)}_{t\to t+12}\approx y^{(10)}_t - D(y)\,\Delta y^{(10)} - r^{3m}_t$; the audit of
+Section~\ref{sec:audit} quantifies exactly how much this construction flatters results.
+
+\section{Two honest failures}\label{sec:failures}
+
+\textbf{Level timing.} Estimated at monthly frequency, the reversion speeds of the first two
+principal components of the US curve are $\kappa\approx 0.022$ (level) and $\approx 0$
+(slope): half-lives of decades. Whatever the anchor knows, it is not that the ten-year
+yield will fall soon. The allocation experiments that motivated this project (not reported
+here; available in the replication repository) confirm that carry and roll-down, not level
+reversion, do the work in curve strategies.
+
+\textbf{The raw risk-premium gap.} Reframed as a return predictor, the natural but
+ultimately failed version is the deviation of the 10-year yield from a legacy long-yield
+anchor $r^*+\pi_e+TP$ regressed on next-12-month bond excess returns. This is not the
+short-rate anchor used below: here the term-premium block is an external long-yield
+benchmark component, whereas in the disciplined specification the term premium is derived
+as a model output. On 1976--2026 the in-sample evidence is genuinely strong: Newey--West $t=2.86$ (lag 12), $R^2=0.13$, and mean
+subsequent 12-month excess returns by gap quintile of
+$\{+0.13,\,+1.9,\,+3.4,\,+4.7,\,+6.55\}$ percent --- clean monotonicity from ``rich'' to
+``cheap.'' Out of sample, against the expanding-mean benchmark with expanding-window
+re-estimation: $R^2_{OOS}=-0.49$. The Cochrane--Piazzesi forward factor, evaluated
+identically, posts $-1.24$. On the modern subsample (2004--2026) the gap's in-sample
+$t$-statistic is only $1.18$ with $R^2_{OOS}=-0.14$. We record both failures at full
+prominence: the in-sample strength is concentrated in the 1980s disinflation and does not
+transfer to a real-time forecaster. The natural response is not to tune the signal but to
+ask \emph{where} the economics actually operate.
+
+\section{The anchor as a short-rate central tendency}\label{sec:model}
+
+Reversion is real at the front end: policy drags the short rate toward neutral. We
+therefore place the anchor where the reversion lives, as the central tendency of the
+instantaneous rate, and derive the whole curve.
+
+\subsection{Models and estimation under the physical measure}
+
+Three diffusions for the 3-month rate $r_t$:
+Ornstein--Uhlenbeck/Vasicek $dr=\kappa(\theta-r)dt+\sigma dW$ (Gaussian transition, closed
+form); CIR $dr=\kappa(\theta-r)dt+\sigma\sqrt{r}\,dW$ (non-central $\chi^2$ transition);
+and Hull--White with the \emph{macro anchor as moving central tendency},
+$dr=\kappa(\theta_t-r)dt+\sigma dW$ with $\theta_t=r^*_t+\pi_{e,t}$. Estimation is always
+under the physical measure P from the time series --- never calibrated to today's curve, so
+the comparison with the observed curve is informative rather than circular. OU is fit by
+its exact AR(1) discretization; CIR by exact-moment weighted least squares, refined by
+non-central-$\chi^2$ maximum likelihood; HW by regressing $\Delta r_t$ on the gap
+$(\theta_t-r_t)$ --- the slope \emph{is} $\kappa\Delta$. All downstream signals use
+\emph{expanding-window} parameters (120-month burn-in); full-sample estimates
+(Table~\ref{tab:params}) are descriptive only.
+
+\begin{table}[t]\centering
+\caption{Full-sample physical-measure estimates, US 3-month rate, 1976--2026 (annualized).}
+\label{tab:params}
+\begin{tabular}{lcccc}
+\toprule
+Model & $\kappa$ & half-life (months) & $\theta$ & $\sigma$ \\
+\midrule
+OU / Vasicek & 0.094 & 88.8 & 3.87\% & 1.49\% \\
+CIR (NC$\chi^2$ ML) & 0.053 & 157 & 3.57\% & 0.061 \\
+HW (anchor) & 0.175 & 47.5 & $r^*_t+\pi_{e,t}$ (moving) & 1.48\% \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\footnotesize Notes: the CIR Feller condition is violated ($2\kappa\theta=0.0019<\sigma^2=0.0034$),
+consistent with a decade at the zero bound. AR-based $\hat\kappa$ is biased upward near a
+unit root. The HW gap-regression $t$-statistic is $1.37$: the halved half-life relative to
+the constant-$\theta$ OU is a point estimate consistent with the thesis, not a
+statistically decisive one --- we say so.
+\end{table}
+
+\subsection{The term premium as an output, and three honesty checks}
+
+For each model the pure-expectations yield (expectations plus convexity, zero price of
+risk) is closed-form affine, $y_{PE}(\tau)=\big(-\ln A(\tau)+B(\tau)\,r_t\big)/\tau$ with
+$B(\tau)=(1-e^{-\kappa\tau})/\kappa$; the HW variant evaluates the Vasicek formula at
+$\theta=\theta_t$ (a random-walk forecast of a slow anchor, stated rather than hidden). The
+model term premium is the wedge $TP_m(\tau,t)=y_{obs}(\tau,t)-y^{m}_{PE}(\tau,t)$.
+Table~\ref{tab:honesty} reports the checks that decide whether this object is new
+information.
+
+\begin{table}[t]\centering
+\caption{Is the model term premium the slope in disguise? Does it track the benchmark?}
+\label{tab:honesty}
+\begin{tabular}{lcc}
+\toprule
+ & corr$(TP_{10},\ \text{slope})$ & corr$(TP_{10},\ \text{Kim--Wright})$ \\
+\midrule
+HW (anchor) & \textbf{0.35} & \textbf{0.70} \\
+OU (constant $\theta$) & 0.77 & 0.03 \\
+CIR & 0.89 & 0.18 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\footnotesize Notes: the anchor is the only ingredient distinguishing HW from OU. Without
+it, the ``term premium'' is a repackaged slope and tracks nothing; with it, a
+three-parameter transparent model tracks the Fed's five-factor benchmark at $0.70$.
+\end{table}
+
+\section{Predictive evidence}\label{sec:pred}
+
+Targets are per-tenor 12-month excess returns in the Fama--Bliss construction,
+$rx^{(n)}_{t\to t+12}=n\,y_t(n)-(n\!-\!1)\,y_{t+12}(n\!-\!1)-y_t(1)$ (off-grid maturities
+interpolated), and a 2--10Y equal-weight basket. Inference uses Newey--West with lag 12
+(overlapping targets). Out-of-sample $R^2$ follows \citet{campbellthompson}: expanding
+forecasting regressions against the expanding mean. Nested significance uses
+\citet{clarkwest} with NW(12) errors, one-sided.
+
+\begin{table}[t]\centering
+\caption{In-sample predictive regressions: $rx^{(n)}\sim TP_{HW}(n)$, Newey--West lag 12.}
+\label{tab:tenor}
+\begin{tabular}{lccccc}
+\toprule
+Tenor & 2y & 3y & 5y & 7y & 10y \\
+\midrule
+$\beta$ per $+1$SD (\%/12m) & $+0.25$ & $+0.48$ & $+1.24$ & $+2.08$ & $+3.48$ \\
+NW $t$ & 2.06 & 2.10 & 2.80 & 3.35 & \textbf{3.87} \\
+$R^2$ & 0.035 & 0.037 & 0.076 & 0.117 & 0.172 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\footnotesize Notes: basket $t=3.04$, $R^2=0.087$. The monotone tenor structure is
+documented here, \emph{before} any out-of-sample claim; it licenses reporting the exact
+10Y result in Table~\ref{tab:horse} as structure rather than selection.
+\end{table}
+
+\begin{table}[t]\centering
+\caption{Horse race on the common evaluation window (1997:05--2026:05, $n=336$ for all).}
+\label{tab:horse}
+\begin{tabular}{lccc}
+\toprule
+Predictor & $R^2_{OOS}$ & Clark--West $t$ & significance \\
+\midrule
+$TP_{HW}$ (anchor model), basket & $\;\;\,+0.012$ & 1.31 & 10\% \\
+$TP_{HW}$, exact 10Y target & $\;\;\,+0.085$ & 2.25 & \textbf{5\%} \\
+$TP_{OU}$ (constant $\theta$) & $-0.080$ & 1.19 & --- \\
+Slope $(y_{10}-y_1)$ & $-0.010$ & 1.60 & 10\% \\
+Fama--Bliss forward spread & $-0.015$ & 1.62 & 10\% \\
+Raw anchor gap (legacy) & $-0.468$ & 0.51 & --- \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\footnotesize Notes: on their longer native windows, slope and Fama--Bliss carry 5\%
+Clark--West stars ($t=1.66,\,1.74$) with \emph{negative} realized $R^2_{OOS}$ ---
+population-level content eaten by estimation noise; both stars fail to survive the common
+window. The HW term premium is the only predictor whose realized forecasts beat the
+benchmark. Adding the slope to $TP_{HW}$ \emph{worsens} $R^2_{OOS}$ ($-0.066$): the
+information is in the model object.
+\end{table}
+
+The claims hierarchy we defend is therefore: (i) the pre-specified strict benchmark ---
+basket $R^2_{OOS}=+0.012$, Clark--West 10\%; (ii) the documented tenor structure --- exact
+10Y $R^2_{OOS}=+0.085$, Clark--West 5\%; and, next, (iii) cross-country replication with
+magnitudes explicitly discounted by the audit of Section~\ref{sec:audit}.
+
+\section{Cross-country replication}\label{sec:panel}
+
+The identical pipeline --- same anchor recipe and half-lives, same HW gap regression, same
+expanding windows, same tests, nothing re-tuned --- is run on nine developed markets.
+Because nothing is chosen on the new data, this stage is better interpreted as a frozen-pipeline
+replication exercise than as another draw from a specification search. Cross-country dependence
+and heterogeneous sample spans still warrant caution, so the sign-replication count is treated
+as the primary panel statistic.
+
+\begin{table}[t]\centering
+\caption{G10 replication of the pre-specified pipeline (duration-approximated 10Y target).}
+\label{tab:panel}
+\begin{tabular}{lcccccc}
+\toprule
+ & $\beta$/SD & NW $t$ & $R^2_{IS}$ & $R^2_{OOS}$ & CW $t$ & $n_{OOS}$ \\
+\midrule
+USA & 0.047 & 5.64 & 0.29 & $+0.216$ & 4.74 & 467 \\
+CAN & 0.036 & 5.18 & 0.20 & $+0.222$ & 4.69 & 520 \\
+SWE & 0.032 & 4.27 & 0.21 & $+0.201$ & 3.20 & 197 \\
+DEU & 0.025 & 3.42 & 0.11 & $+0.016$ & 1.73 & 520 \\
+NOR & 0.024 & 3.18 & 0.14 & $-0.080$ & 1.65 & 221 \\
+AUS & 0.017 & 2.00 & 0.04 & $-0.112$ & $-0.49$ & 404 \\
+NZL & 0.027 & 1.90 & 0.07 & $+0.110$ & 3.06 & 350 \\
+CHE & 0.019 & 1.78 & 0.11 & $-0.429$ & 0.38 & 47 \\
+GBR & 0.014 & 1.50 & 0.03 & $+0.023$ & 1.79 & 520 \\
+\midrule
+\multicolumn{7}{l}{\footnotesize Signs: \textbf{9/9} positive. NW $t>2$: 5/9 ($>1.65$: 8/9).
+$R^2_{OOS}>0$: \textbf{6/9}. CW $>10\%$ crit.: 7/9.}\\
+\multicolumn{7}{l}{\footnotesize Mean-group $\beta=+2.66\%$/SD, $t=7.85$
+\citep{pesaransmith} --- overstated by cross-country dependence;}\\
+\multicolumn{7}{l}{\footnotesize the sign-replication count is the primary statistic, as
+pre-specified. Failures reported: AUS, NOR; CHE has}\\
+\multicolumn{7}{l}{\footnotesize only 47 evaluations; JPN dropped for data overlap (the ZLB
+case --- its absence is flagged, not hidden).}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{The specification and data audit}\label{sec:audit}
+
+The panel's US row ($R^2_{OOS}=+0.215$) is an order of magnitude stronger than the strict
+US benchmark ($+0.012$). A result this sensitive to specification is not reportable until
+the sensitivity itself is measured. We do so in three steps, all on identical evaluation
+months, with reading rules written \emph{before} the numbers.
+
+\subsection{A reconciliation ladder: target versus signal}
+
+On the same US data and common window we evaluate five pairs: (A1) basket signal
+$\to$ basket exact target; (A2) 10Y signal $\to$ exact 10Y target; (B1) panel-style signal
+$\to$ duration-approximated 10Y target; and the cross-variants (B2) affine signal on the
+approximated target, (B3) panel signal on the exact target.
+Table~\ref{tab:ladder} shows B1$\equiv$B2 and B3$\equiv$A2 \emph{to machine precision}: the
+panel's signal is numerically the same object as the affine notebook's --- so the entire
+on-sample gap is the \textbf{target}, never the signal. The decomposition is two steps:
+basket $\to$ exact 10Y adds $+0.07$ of $R^2_{OOS}$ (tenor concentration, licensed by
+Table~\ref{tab:tenor}); exact $\to$ duration-approximated adds $+0.05$. The approximation
+flatters for two identifiable reasons: it shares the yield level (carry) mechanically with
+the predictor, and, lacking roll-down, aging and cross-tenor noise, it is a smoother target
+that a slow signal explains more easily. It is the standard construction of the
+international bond-premium literature, but the honest hierarchy is exact-Fama--Bliss
+first.
+
+\begin{table}[t]\centering
+\caption{Reconciliation ladder, US data, common window (1997:05--, $n=336$).}
+\label{tab:ladder}
+\begin{tabular}{lccc}
+\toprule
+Pair & $R^2_{OOS}$ & CW $t$ & NW $t$ \\
+\midrule
+A1: basket signal $\to$ basket exact & $+0.012$ & 1.31 & 3.04 \\
+A2: 10Y signal $\to$ 10Y exact & $+0.085$ & 2.25 & 3.87 \\
+B1: panel signal $\to$ 10Y dur.-approx. & $+0.140$ & 2.70 & 4.31 \\
+B2: 10Y signal $\to$ 10Y dur.-approx. & $+0.140$ & 2.70 & 4.31 \\
+B3: panel signal $\to$ 10Y exact & $+0.085$ & 2.25 & 3.87 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\footnotesize Notes: B1$=$B2 and B3$=$A2 exactly --- the signal is invariant; the target
+explains everything on-sample.
+\end{table}
+
+\subsection{A row-by-row data audit: the funding series}
+
+What remains between the affine-data B1 ($+0.135$ on common rows) and the panel-USA row is
+data source and sample. A month-by-month comparison of every ingredient over the common
+1976--2025 span (586 months) finds: the ten-year yields are \emph{numerically identical}
+(the OECD long rate is the Fed's GS10; correlation $1.000$, zero difference); CPI is
+identical to a few basis points. The entire source residual is the \textbf{3-month rate}:
+T-bill versus interbank, mean difference $-53$bp, spiking to $-365$bp in October 2008 (the
+TED blowout) and to $-250/-316$bp in 1980--82 --- and it propagates into the $r^*$ proxy
+(correlation drops to $0.70$, also via EWMA burn-in state), the anchor ($-94$bp mean), the
+model TP ($+67$bp) and the target's funding leg. On \emph{identical rows} the same formula
+yields $R^2_{OOS}=0.135$ (CW $2.67$) with the T-bill and $0.208$ (CW $4.17$) with the
+interbank rate: \textbf{seven points of out-of-sample $R^2$ hinge on the choice of the
+short-rate series}. We report both and pick neither; there is a defensible case for the
+interbank rate as the state variable (a smoother funding rate, free of T-bill
+flight-to-quality distortions), and an equally standard case for the T-bill as the correct
+funding leg for Treasury excess returns. The final ingredient, extending the sample from
+1976 back to 1964, is worth roughly $+0.06$.
+
+\subsection{Sample cuts and parameter identification}
+
+Re-running the panel pipeline on US windows: from 1976 the result survives
+($R^2_{OOS}=+0.153$, CW $3.03$) --- it is not a pre-1976 artifact. Re-estimating on
+post-1997 data \emph{alone}, it collapses ($R^2_{OOS}=-0.061$, $n=72$) with the reversion
+speed at its numerical floor ($\hat\kappa=10^{-4}$). The distinction with the strict
+benchmark matters: the benchmark \emph{learns} $\kappa$ from 1976 onward and
+\emph{evaluates} from 1997 (and survives); the cut both learns and evaluates post-1997.
+The economics: \textbf{the anchor-reversion parameter is identified by the pre-ZLB
+history} --- a decade pinned at zero contains no information about reversion toward a
+moving neutral rate. The pre-specified rule then fixes the framing: the panel is
+long-sample cross-country replication; the US common-window result is the strict
+benchmark.
+
+\subsection{Accounting for the full gap}
+
+Adding the pieces: tenor concentration $+0.07$, target approximation $+0.05$, funding
+series $+0.07$, sample $+0.06$ --- the entire spread from the strict $+0.012$ to the panel
+US $+0.215$ is attributed to named, quantified specification choices, with the signal
+itself invariant. To our knowledge such an accounting is rarely reported in this
+literature; we suggest it should be standard whenever a predictability claim spans several
+test designs.
+
+\section{Robustness and the distributional layer}\label{sec:robust}
+
+\textbf{Publication-lag inflation.} Shifting CPI by one month (the real-time proxy) leaves
+the strict benchmark essentially unchanged: $R^2_{OOS}$ $+0.0093$ versus $+0.0116$,
+Clark--West $1.32$ versus $1.31$, NW $t$ $3.07$. The 36-month-half-life trend makes the
+signal slow by construction; this verifies it. Full real-time treatment (ALFRED vintages,
+revisions and not just lag) is the stated upgrade, not claimed.
+
+\textbf{Calibration of the transition densities.} Probability-integral-transform tests of
+the 12-month-ahead short-rate distribution (expanding parameters) favor the
+level-dependent-volatility CIR over the Gaussian OU (KS distance $0.093$ versus $0.209$;
+overlapping observations, so shapes rather than stars). An honest negative rides along:
+in a variance-forecast race, trailing realized variance dominates both models'
+closed-form variances ($R^2_{OOS}$ $0.685$ versus $0.013$ for CIR and $-0.087$ for OU) ---
+the ``closed forms win on second moments'' conjecture fails against simple persistence.
+The two models' 1\% lower quantiles diverge sharply as rates approach zero (maximum
+disagreement September 2011), a clean model-based ZLB regime flag.
+
+\textbf{Economic value.} Sizing duration on the model's closed-form $\E[rx]$ and $SD[rx]$
+(constant-TP forecast for the aged yield; signals lagged one month) improves on static
+duration: Sharpe $0.58\to 0.71$--$0.75$ for sign/linear sizing with maximum drawdown
+halved ($-19.7\%\to -8$/$-11\%$); the $z$-sized book is the most defensive
+(vol $2.3\%$, MaxDD $-6.1\%$, Sharpe $0.63$). Gross of transaction costs.
+
+\section{Discussion: theory as regularization, and multiple testing}\label{sec:disc}
+
+Two patterns organize the results. First, \emph{theory as regularization}: the raw anchor
+gap has the best in-sample fit ($R^2=0.128$) and the worst out-of-sample record
+($-0.47$); the model-disciplined form has less in-sample fit and is the only out-of-sample
+survivor. Imposing the process structure --- expectations, convexity, reversion placed
+where it is identified --- disciplines the signal the way a prior disciplines a regression.
+Second, an explicit multiple-testing account: this is the \emph{third} formulation of one
+idea tested on US data (the two failures are reported at equal prominence), so the
+marginal significance levels deserve a further mental discount \citep{harveyliuzhu}; the
+G10 stage, being a frozen pipeline on new data, does not add to the count. We regard the
+resulting claim --- ``survives out of sample in its disciplined form, with a marginal star,
+replicated in sign across nine markets, with every specification sensitivity quantified''
+--- as the strongest \emph{honest} statement the data permit, and deliberately weaker than
+the strongest statement the numbers would superficially allow.
+
+\section{Limitations}\label{sec:limits}
+
+One-factor models cannot fit a three-factor curve; part of any model TP is misfit and is
+treated relative to its own history. $\hat\kappa$ is biased upward near a unit root, and
+its gap-regression $t$-statistic (1.37) is suggestive, not decisive. The CIR Feller
+condition is violated in a ZLB sample, and the Gaussian HW admits negative rates. The
+duration-approximated panel target flatters ($+0.05$, quantified); panel data are revised
+OECD series with heterogeneous spans; cross-country observations are not independent.
+Results are sensitive to the funding-rate series ($\pm 0.07$; both reported). Economic
+value is gross of costs. The evaluation windows, while common where it matters, remain a
+single historical path.
+
+\section{Conclusion}\label{sec:concl}
+
+A popular macro intuition --- yields gravitate toward $r^*$ plus trend inflation ---
+contains real information about bond risk premia, but only when embedded where its
+economics operate: as the central tendency of the short rate, with the term premium
+derived rather than assumed. Tested with pre-specified protocols, the disciplined form is
+the only predictor among standard benchmarks whose realized out-of-sample forecasts beat
+the expanding mean, replicates in sign across nine markets, survives a real-time inflation
+proxy, and comes with a complete specification audit that attributes every point of
+variation across test designs. The failures along the way --- level timing, the raw gap,
+the variance-forecast conjecture, three countries out of sample, a decade that identifies
+nothing --- are reported at the same volume as the successes, because in this literature
+the reporting standard \emph{is} the result.
+
+\begin{thebibliography}{99}\small
+
+\bibitem[Adrian et al.(2013)]{acm} Adrian, T., R.~K. Crump, and E.~Moench (2013).
+Pricing the term structure with linear regressions. \emph{Journal of Financial
+Economics} 110(1), 110--138.
+
+\bibitem[Bauer and Hamilton(2018)]{bauerhamilton} Bauer, M.~D., and J.~D. Hamilton (2018).
+Robust bond risk premia. \emph{Review of Financial Studies} 31(2), 399--448.
+
+\bibitem[Campbell and Thompson(2008)]{campbellthompson} Campbell, J.~Y., and S.~B.
+Thompson (2008). Predicting excess stock returns out of sample: Can anything beat the
+historical average? \emph{Review of Financial Studies} 21(4), 1509--1531.
+
+\bibitem[Cieslak and Povala(2015)]{cieslakpovala} Cieslak, A., and P.~Povala (2015).
+Expected returns in Treasury bonds. \emph{Review of Financial Studies} 28(10), 2859--2901.
+
+\bibitem[Clark and West(2007)]{clarkwest} Clark, T.~E., and K.~D. West (2007).
+Approximately normal tests for equal predictive accuracy in nested models.
+\emph{Journal of Econometrics} 138(1), 291--311.
+
+\bibitem[Cochrane and Piazzesi(2005)]{cochranepiazzesi} Cochrane, J.~H., and M.~Piazzesi
+(2005). Bond risk premia. \emph{American Economic Review} 95(1), 138--160.
+
+\bibitem[Cox et al.(1985)]{cir} Cox, J.~C., J.~E. Ingersoll, and S.~A. Ross (1985).
+A theory of the term structure of interest rates. \emph{Econometrica} 53(2), 385--407.
+
+\bibitem[Duffee(2002)]{duffee} Duffee, G.~R. (2002). Term premia and interest rate
+forecasts in affine models. \emph{Journal of Finance} 57(1), 405--443.
+
+\bibitem[Fama and Bliss(1987)]{famabliss} Fama, E.~F., and R.~R. Bliss (1987).
+The information in long-maturity forward rates. \emph{American Economic Review} 77(4),
+680--692.
+
+\bibitem[Goyal and Welch(2008)]{goyalwelch} Goyal, A., and I.~Welch (2008).
+A comprehensive look at the empirical performance of equity premium prediction.
+\emph{Review of Financial Studies} 21(4), 1455--1508.
+
+\bibitem[Harvey et al.(2016)]{harveyliuzhu} Harvey, C.~R., Y.~Liu, and H.~Zhu (2016).
+\ldots and the cross-section of expected returns. \emph{Review of Financial Studies}
+29(1), 5--68.
+
+\bibitem[Holston et al.(2017)]{hlw} Holston, K., T.~Laubach, and J.~C. Williams (2017).
+Measuring the natural rate of interest: International trends and determinants.
+\emph{Journal of International Economics} 108, S59--S75.
+
+\bibitem[Hull and White(1990)]{hullwhite} Hull, J., and A.~White (1990).
+Pricing interest-rate-derivative securities. \emph{Review of Financial Studies} 3(4),
+573--592.
+
+\bibitem[Kim and Wright(2005)]{kimwright} Kim, D.~H., and J.~H. Wright (2005).
+An arbitrage-free three-factor term structure model and the recent behavior of long-term
+yields and distant-horizon forward rates. FEDS Working Paper 2005-33.
+
+\bibitem[Kupiec(1995)]{kupiec} Kupiec, P.~H. (1995). Techniques for verifying the accuracy
+of risk measurement models. \emph{Journal of Derivatives} 3(2), 73--84.
+
+\bibitem[Newey and West(1987)]{neweywest} Newey, W.~K., and K.~D. West (1987).
+A simple, positive semi-definite, heteroskedasticity and autocorrelation consistent
+covariance matrix. \emph{Econometrica} 55(3), 703--708.
+
+\bibitem[Pesaran and Smith(1995)]{pesaransmith} Pesaran, M.~H., and R.~Smith (1995).
+Estimating long-run relationships from dynamic heterogeneous panels.
+\emph{Journal of Econometrics} 68(1), 79--113.
+
+\bibitem[Vasicek(1977)]{vasicek} Vasicek, O. (1977). An equilibrium characterization of
+the term structure. \emph{Journal of Financial Economics} 5(2), 177--188.
+
+\end{thebibliography}
+
+\end{document}
